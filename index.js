@@ -53,10 +53,13 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-  console.log(request.body);
-  if (!body.name) {
-    return response.status(400).json({ error: "name missing" });
-  }
+  let errorMessage = undefined;
+  if (!body.name) errorMessage = "name missing";
+  else if (!body.number) errorMessage = "number missing";
+  else if (persons.some((p) => p.name === body.name))
+    errorMessage = "name already exists";
+  if (errorMessage) return response.status(400).json({ error: errorMessage });
+
   const person = {
     name: body.name,
     number: body.number,
