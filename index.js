@@ -1,8 +1,9 @@
 const { response, request } = require("express");
 const express = require("express");
 
-const app = express();
 const PORT = 3001;
+const app = express();
+app.use(express.json());
 
 let persons = [
   {
@@ -48,6 +49,21 @@ app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   persons = persons.filter((p) => p.id !== id);
   response.status(204).end();
+});
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+  console.log(request.body);
+  if (!body.name) {
+    return response.status(400).json({ error: "name missing" });
+  }
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: Math.round(Math.random() * 10 ** 10),
+  };
+  persons = persons.concat(person);
+  response.json(person);
 });
 
 app.listen(PORT, () => {

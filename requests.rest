@@ -6,9 +6,19 @@ GET http://localhost:3001/info
 GET http://localhost:3001/api/persons
 
 ###
-# Get single entry
+# Get entry
 GET http://localhost:3001/api/persons/5
 
 ###
-# Remove single entry
+# Remove entry
 DELETE http://localhost:3001/api/persons/1
+
+###
+# Add entry
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Test Person",
+    "number": "123"
+}
