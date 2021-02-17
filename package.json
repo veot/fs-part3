@@ -1,0 +1,11 @@
+{
+  "name": "phonebook",
+  "version": "0.1.0",
+  "description": "Exercise from part3 of Full Stack Open 2020",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Otso Velhonoja",
+  "license": "MIT"
+}
