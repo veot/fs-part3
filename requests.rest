@@ -1,21 +1,21 @@
 # Get info
-GET http://localhost:3001/info
+GET https://secret-savannah-49654.herokuapp.com/info
 
 ###
 # Get all entries
-GET http://localhost:3001/api/persons
+GET https://secret-savannah-49654.herokuapp.com/api/persons
 
 ###
 # Get entry
-GET http://localhost:3001/api/persons/5
+GET https://secret-savannah-49654.herokuapp.com/api/persons/5
 
 ###
 # Remove entry
-DELETE http://localhost:3001/api/persons/1
+DELETE https://secret-savannah-49654.herokuapp.com/api/persons/1
 
 ###
 # Add entry
-POST http://localhost:3001/api/persons
+POST https://secret-savannah-49654.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
