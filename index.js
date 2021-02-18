@@ -2,7 +2,10 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 
-const PORT = process.env.PORT || 3001;
+require("dotenv").config();
+const Person = require("./models/person");
+
+const PORT = process.env.PORT;
 const app = express();
 
 app.use(express.json());
@@ -41,20 +44,27 @@ let persons = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.get("/info", (request, response) => {
-  const info1 = `Phonebook has info for ${persons.length} people`;
-  const info2 = new Date();
-  response.send(`<p>${info1}</p><p>${info2}`);
+  Person.find({}).then((persons) => {
+    const info1 = `Phonebook has info for ${persons.length} people`;
+    const info2 = new Date();
+    response.send(`<p>${info1}</p><p>${info2}`);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((p) => p.id === id);
-  if (person) response.json(person);
-  else response.status(404).end();
+  Person.findById(request.params.id)
+    .then((person) => {
+      response.json(person);
+    })
+    .catch((err) => {
+      response.status(404).end();
+    });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -66,19 +76,17 @@ app.delete("/api/persons/:id", (request, response) => {
 app.post("/api/persons", (request, response) => {
   const body = request.body;
   let errorMessage = undefined;
-  if (!body.name) errorMessage = "name missing";
-  else if (!body.number) errorMessage = "number missing";
-  else if (persons.some((p) => p.name === body.name))
-    errorMessage = "name already exists";
+  if (body.name === undefined) errorMessage = "name missing";
+  else if (body.number === undefined) errorMessage = "number missing";
+  // else if (persons.some((p) => p.name === body.name))
+  //   errorMessage = "name already exists";
   if (errorMessage) return response.status(400).json({ error: errorMessage });
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: Math.round(Math.random() * 10 ** 10),
-  };
-  persons = persons.concat(person);
-  response.json(person);
+  });
+  person.save().then((savedPerson) => response.json(savedPerson));
 });
 
 app.listen(PORT, () => {
