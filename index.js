@@ -57,37 +57,67 @@ app.get("/info", (request, response) => {
   });
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   Person.findById(request.params.id)
     .then((person) => {
-      response.json(person);
+      if (person) response.json(person);
+      else response.status(404).end();
     })
-    .catch((err) => {
-      response.status(404).end();
-    });
+    .catch((err) => next(err));
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((p) => p.id !== id);
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then((person) => {
+      response.status(204).json(person);
+    })
+    .catch((err) => next(err));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   let errorMessage = undefined;
   if (body.name === undefined) errorMessage = "name missing";
   else if (body.number === undefined) errorMessage = "number missing";
-  // else if (persons.some((p) => p.name === body.name))
-  //   errorMessage = "name already exists";
   if (errorMessage) return response.status(400).json({ error: errorMessage });
 
-  const person = new Person({
-    name: body.name,
-    number: body.number,
+  Person.findOne({ name: body.name }).then((person) => {
+    if (person) {
+      Person.findByIdAndUpdate(
+        person.id,
+        { number: body.number },
+        { new: true }
+      )
+        .then((updatedPerson) => response.json(updatedPerson))
+        .catch((err) => next(err));
+    } else {
+      const person = new Person({
+        name: body.name,
+        number: body.number,
+      });
+      person
+        .save()
+        .then((savedPerson) => response.json(savedPerson))
+        .catch((err) => next(err));
+    }
   });
-  person.save().then((savedPerson) => response.json(savedPerson));
 });
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (err, req, res, next) => {
+  console.log(err.message);
+  if (err.name === "CastError") {
+    return res.status(400).send({ error: "malformed id" });
+  }
+  next(err);
+};
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
