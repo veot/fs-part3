@@ -76,31 +76,24 @@ app.delete("/api/persons/:id", (request, response, next) => {
 
 app.post("/api/persons", (request, response, next) => {
   const body = request.body;
-  let errorMessage = undefined;
-  if (body.name === undefined) errorMessage = "name missing";
-  else if (body.number === undefined) errorMessage = "number missing";
-  if (errorMessage) return response.status(400).json({ error: errorMessage });
-
-  Person.findOne({ name: body.name }).then((person) => {
-    if (person) {
-      Person.findByIdAndUpdate(
-        person.id,
-        { number: body.number },
-        { new: true }
-      )
-        .then((updatedPerson) => response.json(updatedPerson))
-        .catch((err) => next(err));
-    } else {
-      const person = new Person({
-        name: body.name,
-        number: body.number,
-      });
-      person
-        .save()
-        .then((savedPerson) => response.json(savedPerson))
-        .catch((err) => next(err));
-    }
+  const person = new Person({
+    name: body.name,
+    number: body.number,
   });
+  person
+    .save()
+    .then((savedPerson) => response.json(savedPerson))
+    .catch((err) => next(err));
+});
+
+app.put("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { name: req.body.name, number: req.body.number },
+    { new: true, runValidators: true, context: "query" }
+  )
+    .then((updatedPerson) => res.json(updatedPerson))
+    .catch((err) => next(err));
 });
 
 const unknownEndpoint = (req, res) => {
@@ -113,6 +106,8 @@ const errorHandler = (err, req, res, next) => {
   console.log(err.message);
   if (err.name === "CastError") {
     return res.status(400).send({ error: "malformed id" });
+  } else if (err.name == "ValidationError") {
+    return res.status(400).json({ error: err.message });
   }
   next(err);
 };
