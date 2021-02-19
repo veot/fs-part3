@@ -11,7 +11,7 @@ GET https://secret-savannah-49654.herokuapp.com/api/persons/5
 
 ###
 # Remove entry
-DELETE https://secret-savannah-49654.herokuapp.com/api/persons/1
+DELETE https://secret-savannah-49654.herokuapp.com/api/persons/602fc831e5552600158d2a25
 
 ###
 # Add entry
@@ -19,6 +19,6 @@ POST https://secret-savannah-49654.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
-    "name": "Test Person",
-    "number": "123"
+    "name": "Test Person 3",
+    "number": "123asdfasdf"
 }

@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const args = process.argv;
 
 if (args.length !== 3 && args.length !== 5) {
-  console.log("Usage: mongo.js <password> [name] [number]");
+  console.log('Usage: mongo.js <password> [name] [number]');
   process.exit(1);
 }
 
@@ -17,19 +17,19 @@ mongoose
     useUnifiedTopology: true,
     useCreateIndex: true,
   })
-  .then(() => console.log("Database connected successfully"))
-  .catch(() => console.log("Unable to connect to database"));
+  .then(() => console.log('Database connected successfully'))
+  .catch(() => console.log('Unable to connect to database'));
 
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
 });
 
-const Person = mongoose.model("Person", personSchema);
+const Person = mongoose.model('Person', personSchema);
 
 const createPerson = (name, number) => {
   const person = new Person({ name, number });
-  person.save().then((res) => {
+  person.save().then(() => {
     console.log(`Added ${name} ${number} to phonebook`);
     mongoose.connection.close();
   });
@@ -37,7 +37,7 @@ const createPerson = (name, number) => {
 
 const getPeople = () => {
   Person.find({}).then((res) => {
-    console.log("Phonebook:");
+    console.log('Phonebook:');
     res.forEach((person) => {
       console.log(`${person.name} ${person.number}`);
     });
